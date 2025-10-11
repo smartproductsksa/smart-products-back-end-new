@@ -1,0 +1,26 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Force RTL direction */
+html {
+    direction: rtl;
+}
+
+body {
+    direction: rtl;
+}
+
+/* Ensure all Filament components respect RTL */
+.fi-body,
+.fi-sidebar,
+.fi-topbar,
+.fi-main,
+.fi-page,
+.fi-section,
+.fi-form,
+.fi-table {
+    direction: rtl;
+}
