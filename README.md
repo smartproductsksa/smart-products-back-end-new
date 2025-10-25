@@ -264,6 +264,29 @@ This command will:
 - Set all uploaded files to public visibility
 - Process all image directories (articles, news, pages, etc.)
 
+### Page Export/Import
+
+Transfer pages between environments (dev → staging → production):
+
+```bash
+# List all pages
+php artisan pages:list
+
+# Export all pages
+php artisan pages:export --all
+
+# Export specific page
+php artisan pages:export --slug=home
+
+# Import from file
+php artisan pages:import --file=storage/exports/pages/home.json
+
+# Import from directory
+php artisan pages:import --directory=storage/exports/pages --update
+```
+
+See [PAGE_EXPORT_IMPORT_GUIDE.md](./PAGE_EXPORT_IMPORT_GUIDE.md) for detailed usage.
+
 ## Code Style
 
 Format code with Laravel Pint:
