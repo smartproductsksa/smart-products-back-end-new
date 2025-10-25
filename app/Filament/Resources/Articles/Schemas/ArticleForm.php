@@ -53,20 +53,23 @@ class ArticleForm
 
                     RichEditor::make('content')
                         ->required()
-                        ->fileAttachmentsDisk('s3')
+                        ->fileAttachmentsDisk('public')
                         ->fileAttachmentsDirectory('article-attachments')
                         ->columnSpanFull(),
 
                     FileUpload::make('image')
                         ->image()
-                        ->disk('s3')
+                        ->disk('public')
                         ->directory('articles')
+                        ->visibility('public')
                         ->imageEditor()
                         ->imageEditorAspectRatios([
                             '16:9',
                             '4:3',
                             '1:1',
                         ])
+                        ->imagePreviewHeight('250')
+                        ->downloadable()
                         ->maxSize(2048),
                 ])
                 ->columns(1)

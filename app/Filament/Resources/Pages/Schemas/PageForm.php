@@ -5,8 +5,10 @@ namespace App\Filament\Resources\Pages\Schemas;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -66,8 +68,11 @@ class PageForm
                                 FileUpload::make('image')
                                     ->label('Hero Image')
                                     ->image()
-                                    ->disk('s3')
-                                    ->directory('pages/hero'),
+                                    ->disk('public')
+                                    ->directory('pages/hero')
+                                    ->visibility('public')
+                                    ->imagePreviewHeight('250')
+                                    ->downloadable(),
                             ])
                             ->columns(1),
                         
@@ -90,6 +95,7 @@ class PageForm
                             ->columns(1),
                         
                         Builder\Block::make('image_gallery')
+                            ->label('Image Gallery (Simple)')
                             ->schema([
                                 TextInput::make('title')
                                     ->label('Gallery Title'),
@@ -97,10 +103,66 @@ class PageForm
                                     ->label('Images')
                                     ->image()
                                     ->multiple()
-                                    ->disk('s3')
+                                    ->disk('public')
                                     ->directory('pages/gallery')
+                                    ->visibility('public')
                                     ->reorderable()
+                                    ->imagePreviewHeight('150')
+                                    ->panelLayout('grid')
+                                    ->downloadable()
                                     ->required(),
+                            ])
+                            ->columns(1),
+                        
+                        Builder\Block::make('detailed_gallery')
+                            ->label('Gallery with Details (Clients, Team, etc.)')
+                            ->schema([
+                                TextInput::make('section_title')
+                                    ->label('Section Title')
+                                    ->helperText('Optional main title for this gallery section'),
+                                
+                                Repeater::make('items')
+                                    ->label('Gallery Items')
+                                    ->schema([
+                                        TextInput::make('title')
+                                            ->label('Item Title')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->helperText('e.g., Client Name, Team Member Name, etc.'),
+                                        
+                                        FileUpload::make('image')
+                                            ->label('Image')
+                                            ->image()
+                                            ->disk('public')
+                                            ->directory('pages/detailed-gallery')
+                                            ->visibility('public')
+                                            ->imagePreviewHeight('200')
+                                            ->imageEditor()
+                                            ->imageEditorAspectRatios([
+                                                '16:9',
+                                                '4:3',
+                                                '1:1',
+                                            ])
+                                            ->downloadable()
+                                            ->required()
+                                            ->columnSpanFull(),
+                                        
+                                        Textarea::make('description')
+                                            ->label('Description')
+                                            ->rows(3)
+                                            ->maxLength(1000)
+                                            ->helperText('Optional description or additional details')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(2)
+                                    ->reorderable()
+                                    ->collapsible()
+                                    ->cloneable()
+                                    ->itemLabel(fn (array $state): ?string => $state['title'] ?? 'New Item')
+                                    ->addActionLabel('Add Item')
+                                    ->minItems(1)
+                                    ->defaultItems(1)
+                                    ->columnSpanFull(),
                             ])
                             ->columns(1),
                         
@@ -122,14 +184,67 @@ class PageForm
                                 FileUpload::make('image')
                                     ->label('Section Image')
                                     ->image()
-                                    ->disk('s3')
-                                    ->directory('pages/sections'),
+                                    ->disk('public')
+                                    ->directory('pages/sections')
+                                    ->visibility('public')
+                                    ->imagePreviewHeight('200')
+                                    ->downloadable(),
                                 Select::make('image_position')
                                     ->options([
                                         'left' => 'Left',
                                         'right' => 'Right',
                                     ])
                                     ->default('right'),
+                            ])
+                            ->columns(1),
+                        
+                        Builder\Block::make('faq')
+                            ->label('FAQ Section')
+                            ->schema([
+                                TextInput::make('section_title')
+                                    ->label('Section Title')
+                                    ->default('Frequently Asked Questions')
+                                    ->helperText('Main title for the FAQ section'),
+                                
+                                Textarea::make('section_description')
+                                    ->label('Section Description')
+                                    ->rows(2)
+                                    ->helperText('Optional introduction text for the FAQ section')
+                                    ->columnSpanFull(),
+                                
+                                Repeater::make('items')
+                                    ->label('FAQ Items')
+                                    ->schema([
+                                        TextInput::make('question')
+                                            ->label('Question')
+                                            ->required()
+                                            ->maxLength(500)
+                                            ->helperText('The question users are asking')
+                                            ->columnSpanFull(),
+                                        
+                                        RichEditor::make('answer')
+                                            ->label('Answer')
+                                            ->required()
+                                            ->toolbarButtons([
+                                                'bold',
+                                                'italic',
+                                                'underline',
+                                                'link',
+                                                'bulletList',
+                                                'orderedList',
+                                            ])
+                                            ->helperText('Detailed answer to the question')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(1)
+                                    ->reorderable()
+                                    ->collapsible()
+                                    ->cloneable()
+                                    ->itemLabel(fn (array $state): ?string => $state['question'] ?? 'New FAQ Item')
+                                    ->addActionLabel('Add FAQ Item')
+                                    ->minItems(1)
+                                    ->defaultItems(1)
+                                    ->columnSpanFull(),
                             ])
                             ->columns(1),
                         

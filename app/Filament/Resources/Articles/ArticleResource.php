@@ -95,19 +95,24 @@ class ArticleResource extends Resource
                 RichEditor::make('content')
                     ->label('المحتوى')
                     ->required()
+                    ->fileAttachmentsDisk('public')
                     ->fileAttachmentsDirectory('article-attachments')
                     ->columnSpan(2),
 
                 FileUpload::make('image')
                     ->label('الصورة')
                     ->image()
+                    ->disk('public')
                     ->directory('articles')
+                    ->visibility('public')
                     ->imageEditor()
                     ->imageEditorAspectRatios([
                         '16:9',
                         '4:3',
                         '1:1',
                     ])
+                    ->imagePreviewHeight('250')
+                    ->downloadable()
                     ->maxSize(2048)
                     ->columnSpan(2),
             ]);

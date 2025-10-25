@@ -8,7 +8,7 @@ A modern Laravel boilerplate with Filament admin panel, role-based permissions, 
 - **Filament 4.1** - Beautiful admin panel with modern UI
 - **Filament Shield** - Role and permission management
 - **Laravel Trend** - Data trend analysis
-- **AWS S3 Integration** - File storage ready
+- **Local File Storage** - Images stored locally with public access
 - **TailwindCSS** - Utility-first CSS framework
 - **Vite** - Fast build tool
 - **Concurrently** - Run multiple dev servers simultaneously
@@ -102,7 +102,17 @@ This will create:
 - Permissions for all Filament resources
 - Policy classes for authorization
 
-### 8. Assign Super Admin Role
+### 8. Create Storage Symlink
+
+Create a symbolic link for public file access:
+
+```bash
+php artisan storage:link
+```
+
+This links `public/storage` to `storage/app/public` for serving uploaded images.
+
+### 9. Assign Super Admin Role
 
 Assign the super_admin role to your user via Tinker:
 
@@ -119,7 +129,7 @@ $user->assignRole('super_admin');
 
 Or create a seeder to automate this process.
 
-### 9. Build Assets
+### 10. Build Assets
 
 ```bash
 npm run build
@@ -239,6 +249,21 @@ Or directly:
 php artisan test
 ```
 
+## Artisan Commands
+
+### Fix Storage Permissions
+
+If uploaded images are not displaying properly, run this command to fix file visibility:
+
+```bash
+php artisan storage:fix-permissions
+```
+
+This command will:
+- Create missing storage directories
+- Set all uploaded files to public visibility
+- Process all image directories (articles, news, pages, etc.)
+
 ## Code Style
 
 Format code with Laravel Pint:
@@ -249,9 +274,46 @@ Format code with Laravel Pint:
 
 ## Additional Configuration
 
-### AWS S3 Setup
+### File Storage
 
-Configure S3 in `.env`:
+Images are stored locally in `storage/app/public/` with the following structure:
+
+```
+storage/app/public/
+├── articles/              # Article images
+├── news/                  # News images
+├── pages/
+│   ├── hero/             # Page hero images
+│   ├── gallery/          # Simple gallery images
+│   ├── detailed-gallery/ # Detailed gallery images (clients, team, etc.)
+│   └── sections/         # Page section images
+├── article-attachments/  # Rich editor attachments
+└── news-attachments/     # Rich editor attachments
+```
+
+Images are accessible via: `{APP_URL}/storage/{directory}/{filename}`
+
+For details on the storage system, see [STORAGE_MIGRATION.md](./STORAGE_MIGRATION.md).
+
+### Page Builder Content Blocks
+
+The page builder supports the following content blocks:
+
+- **Hero Section** - Large header with title, text, and image
+- **Text Section** - Rich text content with formatting
+- **Image Gallery (Simple)** - Multiple images with one title (for photo galleries)
+- **Gallery with Details** - Each item has title, image, and description (for clients, team, partners)
+- **Text with Image** - Combination of text and image side-by-side
+- **FAQ Section** - Frequently Asked Questions with expandable Q&A items
+- **Model List** - Dynamic content from articles, news, or categories
+
+See detailed guides:
+- [DETAILED_GALLERY_GUIDE.md](./DETAILED_GALLERY_GUIDE.md) - Gallery features
+- [FAQ_SECTION_GUIDE.md](./FAQ_SECTION_GUIDE.md) - FAQ section implementation
+
+### AWS S3 Setup (Optional)
+
+If you need S3 storage for other purposes, configure it in `.env`:
 
 ```env
 AWS_ACCESS_KEY_ID=your-key
@@ -260,6 +322,8 @@ AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=your-bucket
 AWS_USE_PATH_STYLE_ENDPOINT=false
 ```
+
+**Note**: Images for pages, articles, and news are currently configured to use local storage, not S3.
 
 ### Queue Configuration
 
