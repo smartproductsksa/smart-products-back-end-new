@@ -175,6 +175,53 @@ docker-compose exec app php artisan make:filament-user
 
 See [DOCKER_QUICK_START.md](./DOCKER_QUICK_START.md) and [DOCKER_SETUP_GUIDE.md](./DOCKER_SETUP_GUIDE.md) for details.
 
+#### Docker Troubleshooting
+
+**Permission Errors (Production Servers)**
+
+If you see errors like:
+```
+The stream or file "/var/www/html/storage/logs/laravel.log" could not be opened
+The /var/www/html/bootstrap/cache directory must be present and writable
+```
+
+Fix with:
+```bash
+# Stop containers
+docker-compose down
+
+# Fix permissions
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache  
+chmod -R 777 storage/logs storage/framework
+
+# Create directories
+mkdir -p storage/framework/{cache,sessions,testing,views}
+mkdir -p storage/logs
+mkdir -p bootstrap/cache
+
+# Rebuild and restart
+docker-compose build --no-cache
+docker-compose up -d
+
+# Run initialization
+docker-compose exec app sh /var/www/html/docker/init-app.sh
+```
+
+**Using Standard Ports (80/443)**
+
+Create a `.env` file with:
+```env
+HTTP_PORT=80
+HTTPS_PORT=443
+```
+
+Then restart:
+```bash
+docker-compose down
+docker-compose up -d
+```
+
 ### Option 2: Local Development
 
 **Quick Setup (Automated):**

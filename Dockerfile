@@ -45,10 +45,17 @@ COPY . .
 # Generate optimized autoloader
 RUN composer dump-autoload --optimize
 
+# Create storage directories
+RUN mkdir -p storage/framework/{cache,sessions,testing,views} \
+    && mkdir -p storage/logs \
+    && mkdir -p bootstrap/cache
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && chmod -R 777 /var/www/html/storage/logs \
+    && chmod -R 777 /var/www/html/storage/framework
 
 # Expose port 9000 for PHP-FPM
 EXPOSE 9000
