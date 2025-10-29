@@ -16,7 +16,7 @@ class ArticleTest extends TestCase
         $fillable = [
             'title',
             'slug',
-            'category',
+            'category_id',
             'tags',
             'content',
             'image',
@@ -30,7 +30,11 @@ class ArticleTest extends TestCase
     public function it_has_casts_attributes()
     {
         $article = new Article();
-        $this->assertEquals(['tags' => 'array'], $article->getCasts());
+        $this->assertEquals([
+            'tags' => 'array',
+            'id' => 'int',
+            'deleted_at' => 'datetime',
+        ], $article->getCasts());
     }
 
     /** @test */
@@ -53,14 +57,14 @@ class ArticleTest extends TestCase
         $article = Article::factory()->create([
             'title' => 'Test Article',
             'slug' => 'test-article',
-            'category' => 'technology',
             'content' => 'This is a test article content.',
         ]);
 
         $this->assertDatabaseHas('articles', [
             'title' => 'Test Article',
             'slug' => 'test-article',
-            'category' => 'technology',
         ]);
+        
+        $this->assertNotNull($article->category_id);
     }
 }

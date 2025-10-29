@@ -15,7 +15,12 @@ A modern Laravel boilerplate with Filament admin panel, role-based permissions, 
 
 ## Requirements
 
-- PHP 8.2 or higher
+### For Docker (Recommended)
+- Docker & Docker Compose
+- At least 4GB RAM allocated to Docker
+
+### For Local Development
+- PHP 8.3 or higher (with extensions: intl, bcmath, gd, zip, pdo_mysql)
 - Composer
 - Node.js & NPM
 - MySQL/PostgreSQL/SQLite database
@@ -137,9 +142,42 @@ npm run build
 
 ## Running the Application
 
-### Quick Setup (Automated)
+### Option 1: Docker (Recommended for Production)
 
-Run the automated setup script:
+**Quick Setup:**
+```bash
+./docker-setup.sh
+```
+
+**Manual Setup:**
+```bash
+# 1. Setup environment
+cp docker/env.example .env
+
+# 2. Generate SSL certificates
+cd docker/nginx/ssl && ./generate-ssl.sh && cd ../../..
+
+# 3. Start services
+docker-compose up -d
+
+# 4. Initialize database
+docker-compose exec app php artisan migrate --force
+docker-compose exec app php artisan make:filament-user
+```
+
+**Access:**
+- HTTP: `http://localhost:8080` (redirects to HTTPS)
+- HTTPS: `https://localhost:8443`
+- Admin: `https://localhost:8443/admin`
+- API: `https://localhost:8443/api/v1/`
+
+**Note:** Self-signed SSL certificates are used for development. Your browser will show a security warning that you need to accept.
+
+See [DOCKER_QUICK_START.md](./DOCKER_QUICK_START.md) and [DOCKER_SETUP_GUIDE.md](./DOCKER_SETUP_GUIDE.md) for details.
+
+### Option 2: Local Development
+
+**Quick Setup (Automated):**
 
 ```bash
 composer setup
@@ -153,7 +191,7 @@ This will:
 - Install NPM dependencies
 - Build assets
 
-### Development Mode
+**Development Mode:**
 
 Start all development servers (Laravel, Queue, Logs, Vite):
 
@@ -182,8 +220,12 @@ npm run dev
 
 ### Access Filament Admin Panel
 
-Navigate to:
+**Docker:**
+```
+https://localhost/admin
+```
 
+**Local:**
 ```
 http://localhost:8000/admin
 ```
